@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record model="ir.actions.act_window" id="action_leave_reporting_view_form">
+        <field name="name">Time Off And Allocation</field>
+        <field name="res_model">hr.leave.report</field>
+        <field name="view_mode">pivot</field>
+    </record>
+    <menuitem name="Leave Summary" id="menu_custom_module_new_item"
+              parent="hr_holidays.menu_hr_holidays_report"
+              action="action_leave_reporting_view_form"
+              sequence="10"/>
+</odoo>
