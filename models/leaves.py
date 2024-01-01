@@ -16,7 +16,7 @@ class LeavesLogicInherit(models.Model):
     def _onchange_date(self):
 
         print('hello')
-        records = self.env['hr.leave'].sudo().search([('holiday_status_id.name', '=', 'Sick Leave')])
+        records = self.env['hr.leave'].sudo().search([('holiday_status_id.name', '=', 'Sick Leave'), ('state', '=', 'validate')])
         for rec in records:
             if self.holiday_status_id.name == 'Sick Leave':
                 if self.request_date_from and self.request_date_to:
