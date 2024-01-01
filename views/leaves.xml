@@ -8,11 +8,11 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='name']"
                        position="after">
-                    <field name="sick_leave_already_taken" groups="base.group_no_one"/>
-                    <field name="one_more_days_taken_sick_leave" groups="base.group_no_one"/>
+<!--                    <field name="sick_leave_already_taken" groups="base.group_no_one"/>-->
+<!--                    <field name="one_more_days_taken_sick_leave" groups="base.group_no_one"/>-->
                     <field name="is_it_sick_leave" invisible="1"/>
                     <field name="attachment_file" widget="binary" filename="attachment_filename"
-                           attrs="{'required':['|',('one_more_days_taken_sick_leave','=', True), ('sick_leave_already_taken','=', True)], 'invisible':[('is_it_sick_leave','=', False)]}"/>
+                           attrs="{'required':[('is_it_sick_leave','=', True)], 'invisible':[('is_it_sick_leave','=', False)]}"/>
                     <!--                    <button class="o_AttachmentBox_buttonAdd btn btn-link" type="button" t-on-click="_onClickAdd" name="add_attachment_file">-->
                     <!--                        <i class="fa fa-plus-square"/>-->
                     <!--                        Add attachments-->
