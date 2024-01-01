@@ -5,7 +5,8 @@
     'depends': ['base', 'hr'],
     'data': [
         'views/leave_allocation_casual.xml',
-        'views/leaves_reporting.xml'
+        'views/leaves_reporting.xml',
+        'views/leaves.xml',
 
     ],
 
