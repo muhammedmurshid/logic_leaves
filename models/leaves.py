@@ -4,7 +4,7 @@ from odoo import models, fields, api, _
 class LeavesLogicInherit(models.Model):
     _inherit = 'hr.leave'
 
-    attachment_file = fields.Binary(string='Attachment File', attachment=True)
+    attachment_file = fields.Binary(string='Attachment File (150 KB)', attachment=True)
     # sick_leave_already_taken = fields.Boolean('Sick Leave Already Taken')
     # one_more_days_taken_sick_leave = fields.Boolean('One More Days Taken Sick Leave')
     is_it_sick_leave = fields.Boolean('Is It Sick Leave')
