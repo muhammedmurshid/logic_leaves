@@ -1,4 +1,5 @@
 from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
 
 
 class LeavesLogicInherit(models.Model):
@@ -8,6 +9,33 @@ class LeavesLogicInherit(models.Model):
     # sick_leave_already_taken = fields.Boolean('Sick Leave Already Taken')
     # one_more_days_taken_sick_leave = fields.Boolean('One More Days Taken Sick Leave')
     is_it_sick_leave = fields.Boolean('Is It Sick Leave')
+    is_it_old_day = fields.Boolean('Is It Old Day')
+
+
+    @api.onchange('request_date_from', 'request_date_to')
+    def _onchange_request_date(self):
+        today = fields.Date.today()
+        print(today, 'today')
+        print(self.request_date_from, 'from')
+        print(self.request_date_to, 'to')
+        if self.request_date_from and self.request_date_to:
+            if self.request_date_from < today or self.request_date_to < today:
+                self.is_it_old_day = True
+            else:
+                self.is_it_old_day = False
+
+    @api.model
+    def create(self, vals):
+        print(vals.get('is_it_old_day'), 'vals')
+        print(self,'self')
+        # return super(LeavesLogicInherit, self).create(vals)
+        if vals.get('is_it_old_day'):
+            if vals.get('is_it_old_day') == True:
+                print('is old day')
+                raise ValidationError(_('This date is invalid for leave request due to being in the past.'))
+            else:
+                print('not old day')
+        return super(LeavesLogicInherit, self).create(vals)
 
     def add_attachment_file(self):
         print('hello')
