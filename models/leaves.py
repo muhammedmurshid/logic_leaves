@@ -10,6 +10,7 @@ class LeavesLogicInherit(models.Model):
     # one_more_days_taken_sick_leave = fields.Boolean('One More Days Taken Sick Leave')
     is_it_sick_leave = fields.Boolean('Is It Sick Leave')
     is_it_old_day = fields.Boolean('Is It Old Day')
+    note = fields.Text(readonly=1, string='Note', default='Departing without obtaining approval from both HR and the Head will be deemed as Leave Without Pay (LOP), except in cases of emergencies.')
 
 
     # @api.onchange('request_date_from', 'request_date_to')

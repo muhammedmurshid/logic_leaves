@@ -15,6 +15,10 @@
                     <field name="attachment_file" widget="binary" filename="attachment_filename"
                            attrs="{'required':[('is_it_sick_leave','=', True)], 'invisible':[('is_it_sick_leave','=', False)]}"/>
                 </xpath>
+                <xpath expr="//field[@name='department_id']"
+                       position="after">
+                    <field name="note" style="color:red;"/>
+                </xpath>
             </field>
         </record>
     </data>
