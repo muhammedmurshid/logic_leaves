@@ -13,30 +13,30 @@ class LeavesLogicInherit(models.Model):
     note = fields.Text(readonly=1, string='Note', default='Departing without obtaining approval from both HR and the Head will be deemed as Leave Without Pay (LOP), except in cases of emergencies.')
 
 
-    # @api.onchange('request_date_from', 'request_date_to')
-    # def _onchange_request_date(self):
-    #     today = fields.Date.today()
-    #     print(today, 'today')
-    #     print(self.request_date_from, 'from')
-    #     print(self.request_date_to, 'to')
-    #     if self.request_date_from and self.request_date_to:
-    #         if self.request_date_from < today or self.request_date_to < today:
-    #             self.is_it_old_day = True
-    #         else:
-    #             self.is_it_old_day = False
+    @api.onchange('request_date_from', 'request_date_to')
+    def _onchange_request_date(self):
+        today = fields.Date.today()
+        print(today, 'today')
+        print(self.request_date_from, 'from')
+        print(self.request_date_to, 'to')
+        if self.request_date_from and self.request_date_to:
+            if self.request_date_from < today or self.request_date_to < today:
+                self.is_it_old_day = True
+            else:
+                self.is_it_old_day = False
 
-    # @api.model
-    # def create(self, vals):
-    #     print(vals.get('is_it_old_day'), 'vals')
-    #     print(self,'self')
-    #     # return super(LeavesLogicInherit, self).create(vals)
-    #     if vals.get('is_it_old_day'):
-    #         if vals.get('is_it_old_day') == True:
-    #             print('is old day')
-    #             raise ValidationError(_('This date is invalid for leave request due to being in the past.'))
-    #         else:
-    #             print('not old day')
-    #     return super(LeavesLogicInherit, self).create(vals)
+    @api.model
+    def create(self, vals):
+        print(vals.get('is_it_old_day'), 'vals')
+        print(self,'self')
+        # return super(LeavesLogicInherit, self).create(vals)
+        if vals.get('is_it_old_day'):
+            if vals.get('is_it_old_day') == True:
+                print('is old day')
+                raise ValidationError(_('This date is invalid for leave request due to being in the past.'))
+            else:
+                print('not old day')
+        return super(LeavesLogicInherit, self).create(vals)
 
     def add_attachment_file(self):
         print('hello')
