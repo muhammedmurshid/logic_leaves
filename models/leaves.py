@@ -12,6 +12,15 @@ class LeavesLogicInherit(models.Model):
     is_it_old_day = fields.Boolean('Is It Old Day')
     note = fields.Text(readonly=1, string='Note', default='Departing without obtaining approval from both HR and the Head will be deemed as Leave Without Pay (LOP), except in cases of emergencies.')
 
+    @api.onchange('request_date_from')
+    def _compute_get_time_of_manager(self):
+        res_user = self.env['res.users'].search([('id', '=', self.env.user.id)])
+        if res_user.has_group('hr_holidays.group_hr_holidays_user'):
+            self.is_this_time_off_manager = True
+        else:
+            self.is_this_time_off_manager = False
+
+    is_this_time_off_manager = fields.Boolean('Is This Time Off Manager', compute='_compute_get_time_of_manager')
 
     @api.onchange('request_date_from', 'request_date_to')
     def _onchange_request_date(self):
@@ -19,11 +28,13 @@ class LeavesLogicInherit(models.Model):
         print(today, 'today')
         print(self.request_date_from, 'from')
         print(self.request_date_to, 'to')
-        if self.request_date_from and self.request_date_to:
-            if self.request_date_from < today or self.request_date_to < today:
-                self.is_it_old_day = True
-            else:
-                self.is_it_old_day = False
+        if self.is_this_time_off_manager == False:
+            if self.request_date_from and self.request_date_to:
+                if self.request_date_from < today or self.request_date_to < today:
+                    self.is_it_old_day = True
+                else:
+                    self.is_it_old_day = False
+
 
     @api.model
     def create(self, vals):
