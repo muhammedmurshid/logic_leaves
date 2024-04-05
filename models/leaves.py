@@ -1,5 +1,6 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
+from datetime import timedelta
 
 
 class LeavesLogicInherit(models.Model):
@@ -25,15 +26,20 @@ class LeavesLogicInherit(models.Model):
     @api.onchange('request_date_from', 'request_date_to')
     def _onchange_request_date(self):
         today = fields.Date.today()
+        yesterday = self.request_date_to + timedelta(days=1)
         print(today, 'today')
+        print(yesterday, 'yesterday')
         print(self.request_date_from, 'from')
         print(self.request_date_to, 'to')
         if self.is_this_time_off_manager == False:
-            if self.request_date_from and self.request_date_to:
-                if self.request_date_from < today or self.request_date_to < today:
-                    self.is_it_old_day = True
-                else:
-                    self.is_it_old_day = False
+            if yesterday == today or self.request_date_from >= today or self.request_date_to >= today:
+                self.is_it_old_day = False
+            else:
+                if self.request_date_from and self.request_date_to:
+                    if self.request_date_from < today or self.request_date_to < today:
+                        self.is_it_old_day = True
+                    else:
+                        self.is_it_old_day = False
 
 
     @api.model
