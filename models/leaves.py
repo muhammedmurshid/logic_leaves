@@ -27,19 +27,30 @@ class LeavesLogicInherit(models.Model):
     def _onchange_request_date(self):
         today = fields.Date.today()
         yesterday = today - timedelta(days=1)
-        print(today, 'today')
-        print(yesterday, 'yesterday')
-        print(self.request_date_from, 'from')
-        print(self.request_date_to, 'to')
-        if self.is_this_time_off_manager == False:
-            if yesterday == self.request_date_from or yesterday == self.request_date_to or self.request_date_from >= today or self.request_date_to >= today:
-                self.is_it_old_day = False
-            else:
-                if self.request_date_from and self.request_date_to:
-                    if self.request_date_from < today or self.request_date_to < today:
-                        self.is_it_old_day = True
-                    else:
-                        self.is_it_old_day = False
+        if self.request_date_from and self.request_date_to:
+            if self.is_this_time_off_manager == False:
+                print('tru value')
+                if yesterday == self.request_date_from or yesterday == self.request_date_to or self.request_date_from >= today or self.request_date_to >= today:
+                    self.is_it_old_day = False
+                else:
+                    if self.request_date_from and self.request_date_to:
+                        if self.request_date_from < today or self.request_date_to < today:
+                            self.is_it_old_day = True
+                        else:
+                            self.is_it_old_day = False
+        else:
+            print('false value')
+
+        # if self.is_this_time_off_manager == False:
+        #     if self.request_date_from :
+        #         print('from')
+        #         print(today, 'today')
+        #         print(yesterday, 'yesterday')
+        #         print(self.request_date_from, 'from')
+        #         print(self.request_date_to, 'to')
+
+        #     else:
+        #         print('not from')
 
 
     @api.model
