@@ -7,6 +7,8 @@
         'views/leave_allocation_casual.xml',
         'views/leaves_reporting.xml',
         'views/leaves.xml',
+        'data/activity.xml',
+        'views/leave_type.xml',
 
     ],
 

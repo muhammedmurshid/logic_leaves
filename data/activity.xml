@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+        <record id="mail_act_leave_head_approval" model="mail.activity.type">
+            <field name="name">Time Off Head Approve</field>
+            <field name="icon">fa-sun-o</field>
+            <field name="res_model_id" ref="hr_holidays.model_hr_leave"/>
+        </record>
+    </data>
+</odoo>
