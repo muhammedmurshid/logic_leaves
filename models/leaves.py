@@ -202,3 +202,16 @@ class LeavesLogicInherit(models.Model):
             #     self.one_more_days_taken_sick_leave = False
         else:
             self.is_it_sick_leave = False
+
+    def action_approve(self):
+        user = self.env.ref('hr_holidays.group_hr_holidays_user').users
+        hr = []
+        for j in user:
+            hr.append(j.id)
+            print(j.id, 'hello approve')
+            print(self.env.user.id, 'env user')
+        if self.env.user.id not in hr:
+            raise ValidationError(_('Only HR Manager can approve this leave.'))
+        else:
+
+            super(LeavesLogicInherit, self).action_approve()
