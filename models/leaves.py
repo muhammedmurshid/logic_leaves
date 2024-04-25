@@ -213,5 +213,10 @@ class LeavesLogicInherit(models.Model):
         if self.env.user.id not in hr:
             raise ValidationError(_('Only HR Manager can approve this leave.'))
         else:
-
             super(LeavesLogicInherit, self).action_approve()
+
+    def action_get_global_time_off(self):
+        leave = self.env['resource.calendar'].sudo().search([])
+        for i in leave.global_leave_ids:
+            print(i.name, 'name')
+            print('date', i.date_from, i.date_to)

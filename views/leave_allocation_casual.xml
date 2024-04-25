@@ -5,12 +5,26 @@
         <field name="model">hr.employee</field>
         <field name="inherit_id" ref="hr.view_employee_form"/>
         <field name="arch" type="xml">
-<!--            <xpath expr="//field[@name='work_location']" position="after">-->
-<!--                <field name="joining_date_cus"/>-->
-<!--            </xpath>-->
+            <!--            <xpath expr="//field[@name='work_location']" position="after">-->
+            <!--                <field name="joining_date_cus"/>-->
+            <!--            </xpath>-->
             <xpath expr="//field[@name='user_id']" position="after">
                 <field name="joining_date_cus"/>
             </xpath>
         </field>
     </record>
+
+    <record id="view_of_employee_leave_approve_button" model="ir.ui.view">
+        <field name="name">inherit.head.approve</field>
+        <field name="model">hr.leave.allocation</field>
+        <field name="inherit_id" ref="hr_holidays.hr_leave_allocation_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_confirm']" position="after">
+                <button string="Head Approve" type="object" name="action_head_approval" states="head_approve" class="oe_highlight"/>
+                <button name="action_head_reject" string="Head Refuse" type="object" states="head_approve"/>
+                <button string="Mark as Draft" type="object" name="action_mark_as_draft_head" states="head_approve"/>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>
