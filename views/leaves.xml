@@ -52,9 +52,9 @@
                     <button string="Validate" name="action_validate" states="validate1" type="object"
                             groups="hr_holidays.group_hr_holidays_manager" class="oe_highlight"/>
                     <button string="Head Approve" name="action_head_approve" type="object" class="oe_highlight"
-                            attrs="{'invisible': [('state', '!=', 'head_approve')]}"/>
-                    <button string="Head Reject" name="action_head_refuse" type="object" class="oe_highlight"
-                            attrs="{'invisible': [('state', '!=', 'head_approve')]}"/>
+                            states="head_approve"/>
+                    <button string="Head Reject" name="action_head_refuse" type="object"
+                            states="head_approve"/>
 
                     <button string="Refuse" name="action_refuse" type="object"
                             attrs="{'invisible': ['|', ('can_approve', '=', False), ('state', 'not in', ('confirm','validate1','validate'))]}"/>
