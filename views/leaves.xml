@@ -62,7 +62,7 @@
                             attrs="{'invisible': ['|', ('can_reset', '=', False), ('state', 'not in', ['confirm', 'refuse'])]}"/>
                     <field name="state" widget="statusbar" statusbar_visible="head_approve,confirm,validate"/>
                     <button string="Mark as Draft" name="action_mark_as_draft" type="object"
-                           states="head_approve"/>
+                           attrs="{'invisible': [ ('state', 'not in', ('head_approve'))]}"/>
                 </header>
                 <sheet>
                     <div class="alert alert-info" role="alert"

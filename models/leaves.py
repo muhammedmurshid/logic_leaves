@@ -5,7 +5,6 @@ import requests
 from pytz import timezone, UTC
 
 
-
 class LeavesLogicInherit(models.Model):
     _inherit = 'hr.leave'
 
@@ -29,7 +28,8 @@ class LeavesLogicInherit(models.Model):
              "\nThe status is 'Refused', when time off request is refused by manager." +
              "\nThe status is 'Approved', when time off request is approved by manager.")
 
-    note = fields.Text(readonly=1, string='Note', default='Departing without obtaining approval from both HR and the Head will be deemed as Leave Without Pay (LOP), except in cases of emergencies.')
+    note = fields.Text(readonly=1, string='Note',
+                       default='Departing without obtaining approval from both HR and the Head will be deemed as Leave Without Pay (LOP), except in cases of emergencies.')
 
     @api.onchange('request_date_from')
     def _compute_get_time_of_manager(self):
@@ -59,7 +59,6 @@ class LeavesLogicInherit(models.Model):
         else:
             print('false value')
 
-
     @api.model
     def create(self, vals):
         print(vals.get('is_it_old_day'), 'vals')
@@ -83,8 +82,8 @@ class LeavesLogicInherit(models.Model):
                 head_number = mob.parent_id.mobile_phone
                 print(head_number, 'head_number')
                 user = 'Manager'
-            #
-            #     # print(response_json)
+                #
+                #     # print(response_json)
                 message_applied = "Hi " + user + ", an employee has requested leave in Logic HRMS. For more details login to https://corp.logiceducation.org"
                 dlt_applied = '1107168381905841814'
                 url = "http://sms.mithraitsolutions.com/httpapi/httpapi?token=adf60dcda3a04ec6d13f827b38349609&sender=LSMKCH&number=" + head_number + "&route=2&type=Text&sms=" + message_applied + "&templateid=" + dlt_applied
@@ -96,7 +95,7 @@ class LeavesLogicInherit(models.Model):
                 user = self.env['res.users'].search([('id', '=', parent_id.parent_id.user_id.id)])
                 self.activity_schedule(
                     'hr_holidays.mail_act_leave_head_approval',
-                    user_id=user.id,)
+                    user_id=user.id, )
                 print(user.name, 'manager name')
                 self.activity_update()
             vals['state'] = 'head_approve'
@@ -126,7 +125,6 @@ class LeavesLogicInherit(models.Model):
                     note=note,
                     user_id=user.id or self.env.user.id)
         super(LeavesLogicInherit, self).activity_update()
-
 
     def add_attachment_file(self):
         print('hello')
@@ -220,3 +218,18 @@ class LeavesLogicInherit(models.Model):
         for i in leave.global_leave_ids:
             print(i.name, 'name')
             print('date', i.date_from, i.date_to)
+
+
+class InheritEmployeeBase(models.AbstractModel):
+    _inherit = 'hr.employee.base'
+
+    current_leave_state = fields.Selection(compute='_compute_leave_status', string="Current Time Off Status",
+                                           selection=[
+                                               ('draft', 'New'),
+                                               ('confirm', 'Waiting Approval'),
+                                               ('head_approve', 'Waiting Head Approval'),
+                                               ('refuse', 'Refused'),
+                                               ('validate1', 'Waiting Second Approval'),
+                                               ('validate', 'Approved'),
+                                               ('cancel', 'Cancelled')
+                                           ])
