@@ -129,6 +129,9 @@ class LeavesLogicInherit(models.Model):
     def add_attachment_file(self):
         print('hello')
 
+    def action_super_approve(self):
+        self.state = 'validate'
+
     def action_confirm(self):
         print('con')
         if self.holiday_status_id.leave_validation_type == 'order_manager_to_hr':
