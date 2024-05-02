@@ -21,24 +21,31 @@ class LeaveAllocationInheritance(models.Model):
 
     @api.model
     def create(self, values):
-        print('leave allocation testing')
-        head_number = self.env['hr.employee'].sudo().search([('id','=',values.get('employee_id'))])
-        print(head_number.parent_id.mobile_phone, 'head number')
-        mobile = str(head_number.parent_id.mobile_phone)
-        user = "Manager"
-        type = "Leave Allocation"
-        message_approved = "Hi " + user + ", an employee has requested " + type + " in Logic HRMS. For more details login to https://corp.logiceducation.org"
-        dlt_approved = '1107168689563797302'
+        print(self.holiday_type, 'leave allocation type')
+        print(values.get('holiday_type'), 'employee type')
+        try:
+            head_number = self.env['hr.employee'].sudo().search([('id', '=', values.get('employee_id'))])
+            if values.get('holiday_type') == 'employee':
+                if self.holiday_type == 'employee':
+                    mobile = str(head_number.parent_id.mobile_phone)
+                    user = "Manager"
+                    type = "Leave Allocation"
+                    message_approved = "Hi " + user + ", an employee has requested " + type + " in Logic HRMS. For more details login to https://corp.logiceducation.org"
+                    dlt_approved = '1107168689563797302'
+                    url = "http://sms.mithraitsolutions.com/httpapi/httpapi?token=adf60dcda3a04ec6d13f827b38349609&sender=LSMKCH&number=" + str(
+                        mobile) + "&route=2&type=Text&sms=" + message_approved + "&templateid=" + dlt_approved
 
-        url = "http://sms.mithraitsolutions.com/httpapi/httpapi?token=adf60dcda3a04ec6d13f827b38349609&sender=LSMKCH&number=" + str(
-            mobile) + "&route=2&type=Text&sms=" + message_approved + "&templateid=" + dlt_approved
+                    # A GET request to the API
+                    response = requests.get(url)
+                    response.json()
 
-        # A GET request to the API
-        response = requests.get(url)
-        response_json = response.json()
-        print(self.state, 'state')
-        values['state'] = 'head_approve'
-        return super(LeaveAllocationInheritance, self).create(values)
+                    values['state'] = 'head_approve'
+            return super(LeaveAllocationInheritance, self).create(values)
+
+        except:
+            print('ooo')
+            return super(LeaveAllocationInheritance, self).create(values)
+
 
     def action_head_approval(self):
         print(self.employee_id.parent_id.user_id.id, 'yes')
