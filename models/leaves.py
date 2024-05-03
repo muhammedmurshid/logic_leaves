@@ -164,7 +164,6 @@ class LeavesLogicInherit(models.Model):
 
     @api.onchange('holiday_status_id')
     def _onchange_date(self):
-
         # print('hello')
         # records = self.env['hr.leave'].sudo().search([('holiday_status_id.name', '=', 'Sick Leave')])
         # for rec in records:

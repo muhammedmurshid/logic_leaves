@@ -26,5 +26,18 @@
             </xpath>
         </field>
     </record>
+    <record id="add_leave_allocation_super_approve_for_hr" model="ir.ui.view">
+        <field name="name">Super Approve Button</field>
+        <field name="model">hr.leave.allocation</field>
+        <field name="inherit_id" ref="hr_holidays.hr_leave_allocation_view_form_manager"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_approve']"
+                   position="after">
+                <button name="action_super_approval" type="object" class="oe_highlight" string="Super Approve"
+                        states="confirm,draft" groups="hr_holidays.group_hr_holidays_user"/>
+            </xpath>
+
+        </field>
+    </record>
 
 </odoo>
