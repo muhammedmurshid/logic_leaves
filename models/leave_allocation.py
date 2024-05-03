@@ -48,7 +48,7 @@ class LeaveAllocationInheritance(models.Model):
         if self.env.user.id != self.employee_id.parent_id.user_id.id:
             raise UserError(_('Only Manager can approve this leave.'))
         else:
-            self.state = 'confirm'
+            self.sudo().write({'state': 'confirm'})
         # self.state = 'confirm'
 
     def action_head_reject(self):

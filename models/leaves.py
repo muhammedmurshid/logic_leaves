@@ -142,7 +142,7 @@ class LeavesLogicInherit(models.Model):
 
     def action_head_approve(self):
         if self.employee_id.parent_id.user_id.id == self.env.user.id:
-            self.state = 'confirm'
+            self.sudo().state = 'confirm'
             self.activity_feedback(['hr_holidays.mail_act_leave_head_approval'])
             hr = self.holiday_status_id.responsible_id
             self.activity_schedule(
