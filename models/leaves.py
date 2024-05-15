@@ -76,10 +76,10 @@ class LeavesLogicInherit(models.Model):
         if leaves_type.leave_validation_type == 'order_manager_to_hr':
             mob = self.env['hr.employee'].search([('id', '=', vals.get('employee_id'))])
             print(mob.parent_id.mobile_phone, 'mobile')
-            if not mob.parent_id.mobile_phone:
+            if not mob.leave_manager_id.employee_id.mobile_phone:
                 raise ValidationError(_('Please add mobile number of Head of Department.'))
             else:
-                head_number = mob.parent_id.mobile_phone
+                head_number = mob.leave_manager_id.employee_id.mobile_phone
                 print(head_number, 'head_number')
                 user = 'Manager'
                 #
@@ -92,7 +92,7 @@ class LeavesLogicInherit(models.Model):
                 response_json = response.json()
                 emp_id = vals['employee_id']
                 parent_id = self.env['hr.employee'].search([('id', '=', emp_id)])
-                user = self.env['res.users'].search([('id', '=', parent_id.parent_id.user_id.id)])
+                user = self.env['res.users'].search([('id', '=', parent_id.leave_manager_id.id)])
                 self.activity_schedule(
                     'hr_holidays.mail_act_leave_head_approval',
                     user_id=user.id, )
@@ -116,7 +116,7 @@ class LeavesLogicInherit(models.Model):
             )
             emp_id = self.employee_id.id
             parent_id = self.env['hr.employee'].search([('id', '=', emp_id)])
-            user = self.env['res.users'].search([('id', '=', parent_id.parent_id.user_id.id)])
+            user = self.env['res.users'].search([('id', '=', parent_id.leave_manager_id.id)])
             if holiday.state == 'draft':
                 to_clean |= holiday
             elif holiday.state == 'head_approve':
@@ -141,7 +141,7 @@ class LeavesLogicInherit(models.Model):
         super(LeavesLogicInherit, self).action_confirm()
 
     def action_head_approve(self):
-        if self.employee_id.parent_id.user_id.id == self.env.user.id:
+        if self.employee_id.leave_manager_id.id == self.env.user.id:
             self.sudo().state = 'confirm'
             self.activity_feedback(['hr_holidays.mail_act_leave_head_approval'])
             hr = self.holiday_status_id.responsible_id
@@ -154,7 +154,7 @@ class LeavesLogicInherit(models.Model):
             raise ValidationError(_('Only Head of Department can approve this leave.'))
 
     def action_head_refuse(self):
-        if self.employee_id.parent_id.user_id.id == self.env.user.id:
+        if self.employee_id.leave_manager_id.id == self.env.user.id:
             self.state = 'refuse'
         else:
             raise ValidationError(_('Only Head of Department can reject this leave.'))

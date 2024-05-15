@@ -29,7 +29,7 @@ class LeaveAllocationInheritance(models.Model):
             if leave_type.name != 'Casual Leave':
                 values['state'] = 'head_approve'
             if not self.holiday_type:
-                mobile = str(head_number.parent_id.mobile_phone)
+                mobile = str(head_number.leave_manager_id.employee_id.mobile_phone)
                 user = "Manager"
                 type = "Leave Allocation"
                 message_approved = "Hi " + user + ", an employee has requested " + type + " in Logic HRMS. For more details login to https://corp.logiceducation.org"
@@ -43,16 +43,16 @@ class LeaveAllocationInheritance(models.Model):
         return super(LeaveAllocationInheritance, self).create(values)
 
     def action_head_approval(self):
-        print(self.employee_id.parent_id.user_id.id, 'yes')
+        print(self.employee_id.leave_manager_id.id, 'yes')
         print(self.env.user.id, 'user')
-        if self.env.user.id != self.employee_id.parent_id.user_id.id:
+        if self.env.user.id != self.employee_id.leave_manager_id.id:
             raise UserError(_('Only Manager can approve this leave.'))
         else:
             self.sudo().write({'state': 'confirm'})
         # self.state = 'confirm'
 
     def action_head_reject(self):
-        if self.env.user.id != self.employee_id.parent_id.user_id.id:
+        if self.env.user.id != self.employee_id.leave_manager_id.id:
             raise UserError(_('Only Manager can approve this leave.'))
         else:
             self.state = 'refuse'
