@@ -22,7 +22,7 @@ class LeavesLogicInherit(models.Model):
         ('refuse', 'Refused'),
         ('validate1', 'Second Approval'),
         ('validate', 'Approved')
-    ], string='Status', compute='_compute_state', store=True, tracking=True, copy=False, readonly=False,
+    ], string='Status', store=True, tracking=True, copy=False, readonly=False,
         help="The status is set to 'To Submit', when a time off request is created." +
              "\nThe status is 'To Approve', when time off request is confirmed by user." +
              "\nThe status is 'Refused', when time off request is refused by manager." +
