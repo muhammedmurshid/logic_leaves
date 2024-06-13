@@ -47,8 +47,8 @@
         <field name="arch" type="xml">
             <xpath expr="//button[@name='action_approve']"
                    position="after">
-                <button name="action_super_approve" type="object" class="oe_highlight" string="Super Approve"
-                        states="confirm,draft" groups="hr_holidays.group_hr_holidays_user"/>
+                <button name="action_super_approve" type="object" style="background-color: #68bd51" string="Super Approve"
+                        states="confirm,draft,head_approve" groups="hr_holidays.group_hr_holidays_user,hr_holidays.group_hr_holidays_manager"/>
             </xpath>
 
         </field>
