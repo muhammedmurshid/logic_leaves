@@ -2,8 +2,9 @@
     'name': "Logic Leaves Allocation",
     'version': "14.0.1.0",
     'sequence': "0",
-    'depends': ['base', 'hr'],
+    'depends': ['base', 'hr', 'web'],
     'data': [
+        'security/ir.model.access.csv',
         'views/leave_allocation_casual.xml',
         'views/leaves_reporting.xml',
         'views/leaves.xml',
@@ -11,6 +12,7 @@
         'views/leave_type.xml',
 
     ],
+
 
     'demo': [],
     'summary': "logic_leaves_allocation",

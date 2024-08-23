@@ -1,0 +1,9 @@
+.unusual-day {
+    background-color: red;
+    color: white;
+    padding: 2px;
+    border-radius: 3px;
+    font-size: 0.8em;
+    text-align: center;
+    margin-top: 2px;
+}

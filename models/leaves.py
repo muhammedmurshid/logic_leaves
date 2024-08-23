@@ -1,8 +1,10 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
-from datetime import timedelta
+from datetime import timedelta, time
 import requests
+from odoo.tools import float_compare, format_date
 from pytz import timezone, UTC
+from datetime import date, datetime
 
 
 class LeavesLogicInherit(models.Model):
@@ -13,6 +15,7 @@ class LeavesLogicInherit(models.Model):
     # one_more_days_taken_sick_leave = fields.Boolean('One More Days Taken Sick Leave')
     is_it_sick_leave = fields.Boolean('Is It Sick Leave')
     is_it_old_day = fields.Boolean('Is It Old Day')
+    reason = fields.Char(string="Reason")
     state = fields.Selection([
         ('draft', 'To Submit'),
         ('cancel', 'Cancelled'),
@@ -31,6 +34,95 @@ class LeavesLogicInherit(models.Model):
     note = fields.Text(readonly=1, string='Note',
                        default='Departing without obtaining approval from both HR and the Head will be deemed as Leave Without Pay (LOP), except in cases of emergencies.')
 
+    # unusual_days_reason = fields.Text(string="Unusual Days Reason")
+    # public_holiday_reason = fields.Char(string="Public Holiday Reason", compute='_compute_public_holiday_reason',
+    #                                     store=True)
+
+    # @api.depends('date_from')  # You may adjust this dependency based on your use case
+    # def _compute_public_holiday_reason(self):
+    #     print('work')
+    #     for record in self:
+    #         if record.holiday_type == 'public_holiday':
+    #             print('kkkkkoooi')  # Replace with the condition that fits your requirement
+    #             holiday = self.env['resource.calendar.leaves'].search([('holiday_id', '=', record.id)], limit=1)
+    #             record.public_holiday_reason = holiday.reason if holiday else 'N/A'
+    #         else:
+    #             print('oooi')
+    #             record.public_holiday_reason = 'N/A'
+
+    # @api.model
+    # def get_unusual_days(self, date_from, date_to=None):
+    #     # Fetch all public holidays
+    #     public_holidays = self.env['resource.calendar.leaves'].search([])
+    #     # Concatenate all public holiday names and reasons
+    #     unusual_days_reason = ', '.join([f"{ph.name}: {ph.name}" for ph in public_holidays])
+    #
+    #     # Update the record with unusual_days_reason
+    #     if self:
+    #         self.ensure_one() # Ensure we're working with a single record
+    #         self.write({'unusual_days_reason': unusual_days_reason})
+    #         # Call the parent method
+    #     return super(LeavesLogicInherit, self).get_unusual_days(date_from, date_to)
+    #
+    # def name_get(self):
+    #     res = []
+    #     public_holidays = self.env['resource.calendar.leaves'].search([])
+    #
+    #     # Concatenate all public holiday names and reasons
+    #     unusual_days_reason = ', '.join([f"{ph.name}: {ph.date_from}" for ph in public_holidays])
+    #     print(unusual_days_reason, 'unusual_days_reason')
+    #     res.append(('unusual_days_info', unusual_days_reason))
+    #     for leave in self:
+    #         # a = leave.unusual_days_reason
+    #         # print(leave, 'a')
+    #         if self.env.context.get('short_name'):
+    #             unusual_days_info = leave.unusual_days_reason or ''
+    #             if leave.leave_type_request_unit == 'hour':
+    #                 res.append((leave.id, _("%s : %.2f hours - %s") % (
+    #                     leave.name or leave.holiday_status_id.name, leave.number_of_hours_display, unusual_days_info)))
+    #             else:
+    #                 res.append((leave.id, _("%s : %.2f days - %s") % (
+    #                     leave.name or leave.holiday_status_id.name, leave.number_of_days, unusual_days_info)))
+    #         else:
+    #             if leave.holiday_type == 'company':
+    #                 target = leave.mode_company_id.name
+    #             elif leave.holiday_type == 'department':
+    #                 target = leave.department_id.name
+    #             elif leave.holiday_type == 'category':
+    #                 target = leave.category_id.name
+    #             else:
+    #                 target = leave.employee_id.name
+    #
+    #             display_date = fields.Date.to_string(leave.date_from)
+    #             unusual_days_info = leave.unusual_days_reason or ''
+    #
+    #             if leave.leave_type_request_unit == 'hour':
+    #                 res.append((
+    #                     leave.id,
+    #                     _("%(person)s on %(leave_type)s: %(duration).2f hours on %(date)s - %(unusual_days_info)s") % {
+    #                         'person': target,
+    #                         'leave_type': leave.holiday_status_id.name,
+    #                         'duration': leave.number_of_hours_display,
+    #                         'date': display_date,
+    #                         # 'unusual_days_info': unusual_days_info,
+    #                     }
+    #                 ))
+    #             else:
+    #                 if leave.number_of_days > 1:
+    #                     display_date += ' ⇨ %s' % fields.Date.to_string(leave.date_to)
+    #                 res.append((
+    #                     leave.id,
+    #                     _("%(person)s on %(leave_type)s: %(duration).2f days (%(start)s) - %(unusual_days_info)s") % {
+    #                         'person': target,
+    #                         'leave_type': leave.holiday_status_id.name,
+    #                         'duration': leave.number_of_days,
+    #                         'start': display_date,
+    #                         # 'unusual_days_info': unusual_days_info,
+    #                     }
+    #                 ))
+    #     print(res, 'res')
+    #     return res
+
     @api.onchange('request_date_from')
     def _compute_get_time_of_manager(self):
         res_user = self.env['res.users'].search([('id', '=', self.env.user.id)])
@@ -44,20 +136,59 @@ class LeavesLogicInherit(models.Model):
     @api.onchange('request_date_from', 'request_date_to')
     def _onchange_request_date(self):
         today = fields.Date.today()
+        last_date = 21
         yesterday = today - timedelta(days=1)
+        print(self.is_this_time_off_manager, 'manager')
+        last_day_of_previous_month = today.replace(day=1) - timedelta(days=1)  # Last day of previous month
+        first_day_of_current_month = today.replace(day=1)  # First day of the current month
+
         if self.request_date_from and self.request_date_to:
-            if self.is_this_time_off_manager == False:
-                print('tru value')
-                if yesterday == self.request_date_from or yesterday == self.request_date_to or self.request_date_from >= today or self.request_date_to >= today:
-                    self.is_it_old_day = False
-                else:
-                    if self.request_date_from and self.request_date_to:
-                        if self.request_date_from < today or self.request_date_to < today:
-                            self.is_it_old_day = True
-                        else:
+            if not self.is_this_time_off_manager:
+                request_date = self.request_date_from
+                # Determine the salary period for the current date
+                if request_date.month == today.month:
+                    if request_date.day < 21:
+                        if today.day <= 21:
                             self.is_it_old_day = False
-        else:
-            print('false value')
+                        else:
+                            self.is_it_old_day = True
+                    else:
+                        self.is_it_old_day = False
+                else:
+                    before_month = today.month - 1
+                    if request_date.month == before_month:
+                        if request_date.day > 20:
+                            self.is_it_old_day = False
+                        else:
+                            self.is_it_old_day = True
+                    else:
+                        if request_date.month > today.month:
+                            self.is_it_old_day = False
+                        else:
+                            self.is_it_old_day = True
+
+
+        # if self.request_date_from and self.request_date_to:
+        #     if self.is_this_time_off_manager == False:
+        #         print('tru value')
+        #         request_date = self.request_date_from
+        #         print(request_date, 'request date')
+        #         if last_date > request_date.day:
+        #             print(last_date, 'last date', request_date.day, 'request day')
+        #             if request_date.month == today.month:
+        #                 print(request_date.month, 're month', today.month, 'to month')
+        #                 self.is_it_old_day = False
+        #             else:
+        #                 if request_date.month == today.month - 1:
+        #                     if 21 < request_date.day:
+        #                         self.is_it_old_day = False
+        #                     else:
+        #                         self.is_it_old_day = True
+        #         else:
+        #             if request_date.month <= today.month:
+        #                 self.is_it_old_day = False
+        # else:
+        #     print('false value')
 
     @api.model
     def create(self, vals):
@@ -164,42 +295,9 @@ class LeavesLogicInherit(models.Model):
 
     @api.onchange('holiday_status_id')
     def _onchange_date(self):
-        # print('hello')
-        # records = self.env['hr.leave'].sudo().search([('holiday_status_id.name', '=', 'Sick Leave')])
-        # for rec in records:
-        #     if self.holiday_status_id.name == 'Sick Leave':
-        #         if self.request_date_from and self.request_date_to:
-        #             print('sick leave')
-        #             if self.env.user.id == rec.create_uid.id:
-        #                 if self.request_date_from.month == rec.request_date_to.month or self.request_date_to.month == rec.request_date_to.month:
-        #                     print(self.env.user.name, 'create uid')
-        #                     self.sick_leave_already_taken = True
-        #                     print(rec.request_date_from.month, 'from month')
-        #
-        #                 else:
-        #                     print('one')
-        #                     self.sick_leave_already_taken = False
-        #         # if self.number_of_days > 1:
-        #         #     self.sick_leave_already_taken = True
-        #         # else:
-        #
-        #         # else:
-        #         #     print('two')
-        #         #     self.sick_leave_already_taken = False
-        #     else:
-        #         print('three')
-        #         self.sick_leave_already_taken = False
-
-        # rec.is_same_month = record.date_field.month == current_month.month
-
-        # print(rec.request_date_from.month, 'from month')
-        # print(rec.request_date_to.month, 'to month')
         if self.holiday_status_id.name == 'Sick Leave':
             self.is_it_sick_leave = True
-            # if self.number_of_days > 1:
-            #     self.one_more_days_taken_sick_leave = True
-            # else:
-            #     self.one_more_days_taken_sick_leave = False
+
         else:
             self.is_it_sick_leave = False
 
@@ -235,3 +333,18 @@ class InheritEmployeeBase(models.AbstractModel):
                                                ('validate', 'Approved'),
                                                ('cancel', 'Cancelled')
                                            ])
+
+
+class PublicHolidayView(models.Model):
+    _name = 'custom.public.holiday.view'
+
+    name = fields.Char('Reason')
+    holiday_status_id = fields.Many2one('hr.leave.type', string="Leave Type")
+
+
+class PublicHoliday(models.Model):
+    _name = 'public.holiday'
+    _description = 'Public Holiday'
+
+    name = fields.Char('Holiday Name', required=True)
+    date = fields.Date('Date', required=True)
