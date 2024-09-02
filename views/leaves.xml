@@ -263,8 +263,8 @@
 
     <record model="ir.actions.act_window" id="sample_public_holiday_action">
         <field name="name">Public Holidays</field>
-        <field name="res_model">resource.calendar.leaves</field>
-        <field name="view_mode">tree</field>
+        <field name="res_model">custom.public.holiday.view</field>
+        <field name="view_mode">tree,form</field>
     </record>
 
     <!--    <record id="hr_holidays.hr_leave_view_dashboard" model="ir.ui.view">-->
