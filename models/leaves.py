@@ -136,11 +136,6 @@ class LeavesLogicInherit(models.Model):
     @api.onchange('request_date_from', 'request_date_to')
     def _onchange_request_date(self):
         today = fields.Date.today()
-        last_date = 21
-        yesterday = today - timedelta(days=1)
-        print(self.is_this_time_off_manager, 'manager')
-        last_day_of_previous_month = today.replace(day=1) - timedelta(days=1)  # Last day of previous month
-        first_day_of_current_month = today.replace(day=1)  # First day of the current month
 
         if self.request_date_from and self.request_date_to:
             if not self.is_this_time_off_manager:
@@ -192,10 +187,9 @@ class LeavesLogicInherit(models.Model):
 
     @api.model
     def create(self, vals):
-        print(vals.get('is_it_old_day'), 'vals')
+
         # print(vals.holiday_status_id.leave_validation_type, 'leave validation type')
-        print(vals['holiday_status_id'], 'self')
-        print(vals['employee_id'], 'values')
+
         # return super(LeavesLogicInherit, self).create(vals)
         if vals.get('is_it_old_day'):
             if vals.get('is_it_old_day') == True:
