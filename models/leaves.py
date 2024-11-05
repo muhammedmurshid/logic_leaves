@@ -133,57 +133,36 @@ class LeavesLogicInherit(models.Model):
 
     is_this_time_off_manager = fields.Boolean('Is This Time Off Manager', compute='_compute_get_time_of_manager')
 
-    @api.onchange('request_date_from', 'request_date_to')
-    def _onchange_request_date(self):
-        today = fields.Date.today()
+    # @api.onchange('request_date_from', 'request_date_to')
+    # def _onchange_request_date(self):
+    #     today = fields.Date.today()
+    #
+    #     if self.request_date_from and self.request_date_to:
+    #         if not self.is_this_time_off_manager:
+    #             request_date = self.request_date_from
+    #             # Determine the salary period for the current date
+    #             if request_date.month == today.month:
+    #                 if request_date.day < 21:
+    #                     if today.day <= 21:
+    #                         self.is_it_old_day = False
+    #                     else:
+    #                         self.is_it_old_day = True
+    #                 else:
+    #                     self.is_it_old_day = False
+    #             else:
+    #                 before_month = today.month - 1
+    #                 if request_date.month == before_month:
+    #                     if request_date.day > 20:
+    #                         self.is_it_old_day = False
+    #                     else:
+    #                         self.is_it_old_day = True
+    #                 else:
+    #                     if request_date.month > today.month:
+    #                         self.is_it_old_day = False
+    #                     else:
+    #                         self.is_it_old_day = True
 
-        if self.request_date_from and self.request_date_to:
-            if not self.is_this_time_off_manager:
-                request_date = self.request_date_from
-                # Determine the salary period for the current date
-                if request_date.month == today.month:
-                    if request_date.day < 21:
-                        if today.day <= 21:
-                            self.is_it_old_day = False
-                        else:
-                            self.is_it_old_day = True
-                    else:
-                        self.is_it_old_day = False
-                else:
-                    before_month = today.month - 1
-                    if request_date.month == before_month:
-                        if request_date.day > 20:
-                            self.is_it_old_day = False
-                        else:
-                            self.is_it_old_day = True
-                    else:
-                        if request_date.month > today.month:
-                            self.is_it_old_day = False
-                        else:
-                            self.is_it_old_day = True
 
-
-        # if self.request_date_from and self.request_date_to:
-        #     if self.is_this_time_off_manager == False:
-        #         print('tru value')
-        #         request_date = self.request_date_from
-        #         print(request_date, 'request date')
-        #         if last_date > request_date.day:
-        #             print(last_date, 'last date', request_date.day, 'request day')
-        #             if request_date.month == today.month:
-        #                 print(request_date.month, 're month', today.month, 'to month')
-        #                 self.is_it_old_day = False
-        #             else:
-        #                 if request_date.month == today.month - 1:
-        #                     if 21 < request_date.day:
-        #                         self.is_it_old_day = False
-        #                     else:
-        #                         self.is_it_old_day = True
-        #         else:
-        #             if request_date.month <= today.month:
-        #                 self.is_it_old_day = False
-        # else:
-        #     print('false value')
 
     @api.model
     def create(self, vals):
