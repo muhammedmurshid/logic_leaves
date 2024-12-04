@@ -236,6 +236,11 @@ class LeavesLogicInherit(models.Model):
     def action_super_approve(self):
         self.state = 'validate'
 
+    def action_super_reject(self):
+        self.sudo().write({
+            'state': 'refuse'
+        })
+
     def action_confirm(self):
         print('con')
         if self.holiday_status_id.leave_validation_type == 'order_manager_to_hr':

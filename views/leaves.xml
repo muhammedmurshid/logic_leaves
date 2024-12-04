@@ -51,6 +51,10 @@
                         string="Super Approve"
                         states="confirm,draft,head_approve"
                         groups="hr_holidays.group_hr_holidays_user,hr_holidays.group_hr_holidays_manager"/>
+                <button name="action_super_reject" type="object" style="background-color: red"
+                        string="Super Reject"
+                        states="confirm,draft,head_approve"
+                        groups="hr_holidays.group_hr_holidays_user,hr_holidays.group_hr_holidays_manager"/>
             </xpath>
 
         </field>
