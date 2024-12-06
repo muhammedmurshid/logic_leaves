@@ -10,6 +10,7 @@
         'views/leaves.xml',
         'data/activity.xml',
         'views/leave_type.xml',
+        'views/refuse_reason.xml',
 
     ],
 

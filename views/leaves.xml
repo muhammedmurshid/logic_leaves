@@ -21,6 +21,11 @@
                     <field name="note" style="color:red;"
                            attrs="{'invisible':[('is_this_time_off_manager','=', True)]}"/>
                 </xpath>
+                <xpath expr="//field[@name='name']"
+                       position="after">
+                    <field name="refuse_reason" style="background-color:#ed5f66;"
+                    states="refuse" string="Refused Reason"/>
+                </xpath>
 
             </field>
         </record>

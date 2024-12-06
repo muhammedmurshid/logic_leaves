@@ -33,6 +33,7 @@ class LeavesLogicInherit(models.Model):
 
     note = fields.Text(readonly=1, string='Note',
                        default='Departing without obtaining approval from both HR and the Head will be deemed as Leave Without Pay (LOP), except in cases of emergencies.')
+    refuse_reason = fields.Text(string="Refuse Reason")
 
     # unusual_days_reason = fields.Text(string="Unusual Days Reason")
     # public_holiday_reason = fields.Char(string="Public Holiday Reason", compute='_compute_public_holiday_reason',
@@ -162,8 +163,6 @@ class LeavesLogicInherit(models.Model):
     #                     else:
     #                         self.is_it_old_day = True
 
-
-
     @api.model
     def create(self, vals):
 
@@ -237,9 +236,19 @@ class LeavesLogicInherit(models.Model):
         self.state = 'validate'
 
     def action_super_reject(self):
-        self.sudo().write({
-            'state': 'refuse'
-        })
+        return  {'type': 'ir.actions.act_window',
+                 'name': _('Refuse Reason'),
+                 'res_model': 'refuse.reason.logic',
+                 'target': 'new',
+                 'view_mode': 'form',
+                 'view_type': 'form',
+                 'context': {'default_leave_id': self.id,
+                             'default_type': 'super_refuse'}, }
+
+        # self.sudo().write({
+        #     'state': 'refuse'
+        # })
+
 
     def action_confirm(self):
         print('con')
@@ -248,6 +257,7 @@ class LeavesLogicInherit(models.Model):
         else:
             self.sudo().write({'state': 'confirm'})
         super(LeavesLogicInherit, self).action_confirm()
+
 
     def action_head_approve(self):
         if self.employee_id.leave_manager_id.id == self.env.user.id:
@@ -262,14 +272,22 @@ class LeavesLogicInherit(models.Model):
         else:
             raise ValidationError(_('Only Head of Department can approve this leave.'))
 
+
     def action_head_refuse(self):
-        if self.employee_id.leave_manager_id.id == self.env.user.id:
-            self.state = 'refuse'
-        else:
-            raise ValidationError(_('Only Head of Department can reject this leave.'))
+        return {'type': 'ir.actions.act_window',
+                'name': _('Refuse Reason'),
+                'res_model': 'refuse.reason.logic',
+                'target': 'new',
+                'view_mode': 'form',
+                'view_type': 'form',
+                'context': {'default_leave_id': self.id,
+                            'default_type': 'head_refuse'}, }
+
+
 
     def action_mark_as_draft(self):
         self.state = 'draft'
+
 
     @api.onchange('holiday_status_id')
     def _onchange_date(self):
@@ -278,6 +296,7 @@ class LeavesLogicInherit(models.Model):
 
         else:
             self.is_it_sick_leave = False
+
 
     def action_approve(self):
         user = self.env.ref('hr_holidays.group_hr_holidays_user').users
@@ -290,6 +309,18 @@ class LeavesLogicInherit(models.Model):
             raise ValidationError(_('Only HR Manager can approve this leave.'))
         else:
             super(LeavesLogicInherit, self).action_approve()
+
+    def action_refuse(self):
+        super(LeavesLogicInherit, self).action_refuse()
+        return {'type': 'ir.actions.act_window',
+                'name': _('Refuse Reason'),
+                'res_model': 'refuse.reason.logic',
+                'target': 'new',
+                'view_mode': 'form',
+                'view_type': 'form',
+                'context': {'default_leave_id': self.id,
+                            'default_type': 'refuse'}, }
+
 
     def action_get_global_time_off(self):
         leave = self.env['resource.calendar'].sudo().search([])
@@ -326,3 +357,29 @@ class PublicHoliday(models.Model):
 
     name = fields.Char('Holiday Name', required=True)
     date = fields.Date('Date', required=True)
+
+
+class RefuseReason(models.TransientModel):
+    _name = 'refuse.reason.logic'
+
+    reason = fields.Text(string="Reason", required=1)
+    leave_id = fields.Many2one('hr.leave')
+    type = fields.Selection([('head_refuse', 'Head Refuse'), ('super_refuse', 'Super Refuse'), ('refuse','Refuse')], string="Type")
+
+    def action_super_refuse_reason(self):
+        self.leave_id.refuse_reason = self.reason
+        self.sudo().leave_id.state = 'refuse'
+
+
+
+    def action_head_refuse_reason(self):
+        self.leave_id.refuse_reason = self.reason
+
+        if self.leave_id.employee_id.leave_manager_id.id == self.env.user.id:
+            self.leave_id.state = 'refuse'
+        else:
+            raise ValidationError(_('Only Head of Department can reject this leave.'))
+
+    def action_refuse_reason(self):
+        self.leave_id.refuse_reason = self.reason
+        self.sudo().leave_id.state = 'refuse'
