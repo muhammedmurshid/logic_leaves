@@ -192,7 +192,7 @@ class LeavesLogicInherit(models.Model):
                 url = "http://sms.mithraitsolutions.com/httpapi/httpapi?token=adf60dcda3a04ec6d13f827b38349609&sender=LSMKCH&number=" + head_number + "&route=2&type=Text&sms=" + message_applied + "&templateid=" + dlt_applied
                 response = requests.get(url)
 
-                response_json = response.json()
+                # response_json = response.json()
                 emp_id = vals['employee_id']
                 parent_id = self.env['hr.employee'].search([('id', '=', emp_id)])
                 user = self.env['res.users'].search([('id', '=', parent_id.leave_manager_id.id)])
