@@ -38,8 +38,8 @@ class LeaveAllocationInheritance(models.Model):
                     mobile) + "&route=2&type=Text&sms=" + message_approved + "&templateid=" + dlt_approved
 
                 # A GET request to the API
-                response = requests.get(url)
-                response.json()
+                # response = requests.get(url)
+                # response.json()
         return super(LeaveAllocationInheritance, self).create(values)
 
     def action_head_approval(self):
